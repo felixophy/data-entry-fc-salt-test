@@ -39,30 +39,34 @@
   .field { display: flex; flex-direction: column; gap: 5px; }
   .field label { font-size: 10px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
 
-  input, select, textarea {
+  input, select {
     background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
     color: var(--text); font-family: var(--mono); font-size: 14px;
     padding: 10px 12px; width: 100%; outline: none; transition: border-color 0.15s; -webkit-appearance: none;
   }
-  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input:focus, select:focus { border-color: var(--accent); }
   input[readonly] { color: var(--muted); background: var(--bg); border-color: var(--border); cursor: not-allowed; }
   input.auto-filled { color: var(--accent2); background: rgba(249,168,37,0.06); border-color: rgba(249,168,37,0.3); }
   input.auto-calc { color: var(--green); background: rgba(105,240,174,0.06); border-color: rgba(105,240,174,0.3); }
-  textarea { resize: vertical; min-height: 64px; font-size: 13px; }
   select option { background: var(--surface2); }
 
-  /* Unflavoured chips section */
   .chips-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
-  .chips-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
 
   /* Rows table */
   .rows-wrapper { overflow-x: auto; margin-top: 4px; }
-  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; min-width: 820px; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; min-width: 900px; }
   thead tr th { background: var(--bg); color: var(--muted); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
   tbody tr:hover { background: rgba(79,195,247,0.04); }
-  tbody td { padding: 5px 4px; }
-  tbody td input, tbody td select, tbody td textarea { padding: 7px 8px; font-size: 13px; min-width: 0; }
+  tbody td { padding: 5px 4px; vertical-align: top; }
+  tbody td input, tbody td select { padding: 7px 8px; font-size: 13px; min-width: 0; }
+
+  /* Feeder cell */
+  .feeder-cell { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+  .feeder-entry { display: grid; grid-template-columns: 52px 1fr 1fr; gap: 4px; align-items: center; }
+  .feeder-entry select { padding: 7px 4px; font-size: 12px; }
+  .feeder-entry input { padding: 7px 6px; font-size: 12px; }
+  .feeder-divider { height: 1px; background: var(--border); margin: 2px 0; }
 
   td.grade-cell input { font-weight: 600; text-align: center; }
   td.grade-A input { color: var(--green); background: rgba(105,240,174,0.08); border-color: rgba(105,240,174,0.3); }
@@ -79,9 +83,9 @@
   .btn-clear { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 14px 18px; }
 
   #status { margin-top: 12px; padding: 12px 16px; border-radius: 8px; font-family: var(--mono); font-size: 13px; display: none; }
-  #status.ok  { background: rgba(105,240,174,0.1); color: var(--green); border: 1px solid rgba(105,240,174,0.3); display:block; }
-  #status.err { background: rgba(255,82,82,0.1);   color: var(--red);   border: 1px solid rgba(255,82,82,0.3);   display:block; }
-  #status.loading { background: rgba(79,195,247,0.1); color: var(--accent); border: 1px solid rgba(79,195,247,0.3); display:block; }
+  #status.ok      { background: rgba(105,240,174,0.1); color: var(--green); border: 1px solid rgba(105,240,174,0.3); display:block; }
+  #status.err     { background: rgba(255,82,82,0.1);   color: var(--red);   border: 1px solid rgba(255,82,82,0.3);   display:block; }
+  #status.loading { background: rgba(79,195,247,0.1);  color: var(--accent);border: 1px solid rgba(79,195,247,0.3);  display:block; }
 
   .info-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .info-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
@@ -171,7 +175,6 @@
         <input type="text" id="saltTarget" readonly class="auto-filled" placeholder="—">
       </div>
     </div>
-    <!-- product info chips -->
     <div class="info-row" id="productInfo" style="display:none; margin-top:10px;">
       <div class="info-chip">Seasoning: <span id="chip-ssn">—</span></div>
       <div class="info-chip">% Seasoning: <span id="chip-pct">—</span></div>
@@ -190,7 +193,7 @@
       <thead>
         <tr>
           <th>Time</th>
-          <th>Feeder Rate</th>
+          <th>Feeder (A/B · Rate · Whole No.)</th>
           <th>Line</th>
           <th>Salt Meter</th>
           <th>Salt % (auto)</th>
@@ -219,7 +222,6 @@
 </div>
 
 <script>
-// ─── Product Reference Data ───────────────────────────────────────────────
 const PRODUCTS = {
   "DELICIES ORIGINAL": {
     ssnCode: "SALT", pctSeasoning: "1.00", saltTarget: "1.00",
@@ -243,10 +245,8 @@ const PRODUCTS = {
   }
 };
 
-// ── REPLACE WITH YOUR APPS SCRIPT URL ────────────────────────────────────
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDG3oaXEy77e8ArzefnCeuh2UwYanwAI7UA0LHyJp816H9OJf3Y9sccTsxM5Jtpq4A/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ4z8YdTkZ243dZw3Z26DPmAwkMnucYSALbts64TdkPeRuWJl1CyE1JDwWrfaD0VFM/exec";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────
 function formatTimeInput(el) {
   let v = el.value.replace(/\D/g, '');
   if (v.length > 2) v = v.slice(0,2) + ':' + v.slice(2,4);
@@ -257,7 +257,6 @@ function getProduct() {
   return PRODUCTS[document.getElementById("productName").value] || null;
 }
 
-// ─── Product Change ───────────────────────────────────────────────────────
 function onProductChange() {
   const p = getProduct();
   if (!p) {
@@ -279,15 +278,11 @@ function onProductChange() {
   recalcAllRows();
 }
 
-// ─── Header AVG ──────────────────────────────────────────────────────────
 function recalcHeader() {
   const v1 = parseFloat(document.getElementById("hdrV1").value);
   const v2 = parseFloat(document.getElementById("hdrV2").value);
-  if (!isNaN(v1) && !isNaN(v2)) {
-    document.getElementById("hdrAvg").value = ((v1 + v2) / 2).toFixed(2);
-  } else {
-    document.getElementById("hdrAvg").value = "";
-  }
+  document.getElementById("hdrAvg").value = (!isNaN(v1) && !isNaN(v2))
+    ? ((v1 + v2) / 2).toFixed(2) : "";
   recalcAllRows();
 }
 
@@ -299,19 +294,49 @@ function getHeaderAvg() {
 // ─── Row Management ───────────────────────────────────────────────────────
 let rowCount = 0;
 
+function feederSelect(id, num) {
+  return `<select id="f${num}ab-${id}"><option value="">—</option><option>A</option><option>B</option></select>`;
+}
+
 function addRow() {
   rowCount++;
   const id = rowCount;
   const tr = document.createElement("tr");
   tr.id = "row-" + id;
   tr.innerHTML = `
-    <td style="min-width:80px"><input type="text" id="time-${id}" placeholder="08:00" maxlength="5" oninput="formatTimeInput(this)"></td>
-    <td style="min-width:160px"><textarea id="feeder-${id}" placeholder="e.g. A 22.00" rows="2"></textarea></td>
-    <td style="min-width:70px"><input type="text" id="line-${id}" placeholder="1"></td>
-    <td style="min-width:90px"><input type="number" id="saltmeter-${id}" placeholder="1.50" step="0.01" oninput="recalcRow(${id})"></td>
-    <td style="min-width:90px"><input type="text" id="saltpct-${id}" readonly class="auto-calc" placeholder="—"></td>
-    <td style="min-width:100px"><input type="text" id="pctblank-${id}" readonly class="auto-calc" placeholder="—"></td>
-    <td class="grade-cell" id="gradecell-${id}" style="min-width:70px"><input type="text" id="grade-${id}" readonly placeholder="—"></td>
+    <td style="min-width:80px">
+      <input type="text" id="time-${id}" placeholder="08:00" maxlength="5" oninput="formatTimeInput(this)">
+    </td>
+    <td>
+      <div class="feeder-cell">
+        <div class="feeder-entry">
+          ${feederSelect(id,1)}
+          <input type="number" id="f1rate-${id}" placeholder="0.00" step="0.01">
+          <input type="number" id="f1whole-${id}" placeholder="0" step="1">
+        </div>
+        <div class="feeder-divider"></div>
+        <div class="feeder-entry">
+          ${feederSelect(id,2)}
+          <input type="number" id="f2rate-${id}" placeholder="0.00" step="0.01">
+          <input type="number" id="f2whole-${id}" placeholder="0" step="1">
+        </div>
+      </div>
+    </td>
+    <td style="min-width:70px">
+      <input type="text" id="line-${id}" placeholder="1">
+    </td>
+    <td style="min-width:90px">
+      <input type="number" id="saltmeter-${id}" placeholder="1.50" step="0.01" oninput="recalcRow(${id})">
+    </td>
+    <td style="min-width:90px">
+      <input type="text" id="saltpct-${id}" readonly class="auto-calc" placeholder="—">
+    </td>
+    <td style="min-width:100px">
+      <input type="text" id="pctblank-${id}" readonly class="auto-calc" placeholder="—">
+    </td>
+    <td class="grade-cell" id="gradecell-${id}" style="min-width:70px">
+      <input type="text" id="grade-${id}" readonly placeholder="—">
+    </td>
     <td style="min-width:100px">
       <select id="checkedby-${id}">
         <option value="">— Select —</option>
@@ -330,11 +355,10 @@ function delRow(id) {
 }
 
 function recalcRow(id) {
-  const sm = parseFloat(document.getElementById("saltmeter-" + id).value);
+  const sm  = parseFloat(document.getElementById("saltmeter-" + id).value);
   const avg = getHeaderAvg();
-  const p = getProduct();
+  const p   = getProduct();
 
-  // Salt % = salt meter - avg, 2dp
   let saltpct = null;
   if (!isNaN(sm) && avg !== null) {
     saltpct = parseFloat((sm - avg).toFixed(2));
@@ -343,27 +367,21 @@ function recalcRow(id) {
     document.getElementById("saltpct-" + id).value = "";
   }
 
-  // % Salt Blank = coeffA * saltpct + coeffB, 2dp
-  let pctblank = null;
-  let grade = "—";
-  let gradeClass = "grade-X";
-
+  let grade = "—", gradeClass = "grade-X";
   if (p && saltpct !== null) {
-    pctblank = parseFloat((p.coeffA * saltpct + p.coeffB).toFixed(2));
+    const pctblank = parseFloat((p.coeffA * saltpct + p.coeffB).toFixed(2));
     document.getElementById("pctblank-" + id).value = pctblank.toFixed(2);
-
     const g = p.grades;
-    if (pctblank >= g.A[0] && pctblank <= g.A[1])      { grade = "A"; gradeClass = "grade-A"; }
+    if      (pctblank >= g.A[0] && pctblank <= g.A[1]) { grade = "A"; gradeClass = "grade-A"; }
     else if (pctblank >= g.B[0] && pctblank <= g.B[1]) { grade = "B"; gradeClass = "grade-B"; }
     else if (pctblank >= g.C[0] && pctblank <= g.C[1]) { grade = "C"; gradeClass = "grade-C"; }
-    else                                                 { grade = "OOC"; gradeClass = "grade-X"; }
+    else                                                { grade = "OOC"; gradeClass = "grade-X"; }
   } else {
     document.getElementById("pctblank-" + id).value = "";
   }
 
   document.getElementById("grade-" + id).value = grade;
-  const cell = document.getElementById("gradecell-" + id);
-  cell.className = "grade-cell " + gradeClass;
+  document.getElementById("gradecell-" + id).className = "grade-cell " + gradeClass;
 }
 
 function recalcAllRows() {
@@ -375,19 +393,8 @@ function recalcAllRows() {
 // ─── Submit ───────────────────────────────────────────────────────────────
 function submitAll() {
   const statusEl = document.getElementById("status");
-
   const prodDate     = document.getElementById("prodDate").value;
-  const grammage     = document.getElementById("grammage").value;
   const productName  = document.getElementById("productName").value;
-  const ssnCode      = document.getElementById("ssnCode").value;
-  const pctSeasoning = document.getElementById("pctSeasoning").value;
-  const ssnBatch     = document.getElementById("ssnBatch").value;
-  const expDate      = document.getElementById("expDate").value;
-  const saltTarget   = document.getElementById("saltTarget").value;
-  const hdrTime      = document.getElementById("hdrTime").value;
-  const hdrV1        = document.getElementById("hdrV1").value;
-  const hdrV2        = document.getElementById("hdrV2").value;
-  const hdrAvg       = document.getElementById("hdrAvg").value;
 
   if (!prodDate || !productName) {
     statusEl.className = "err";
@@ -399,14 +406,19 @@ function submitAll() {
   document.querySelectorAll("[id^='time-']").forEach(el => {
     const id = el.id.split("-")[1];
     rows.push({
-      time:       document.getElementById("time-"      + id).value,
-      feeder:     document.getElementById("feeder-"    + id).value,
-      line:       document.getElementById("line-"      + id).value,
-      saltMeter:  document.getElementById("saltmeter-" + id).value,
-      saltPct:    document.getElementById("saltpct-"   + id).value,
-      pctBlank:   document.getElementById("pctblank-"  + id).value,
-      grade:      document.getElementById("grade-"     + id).value,
-      checkedBy:  document.getElementById("checkedby-" + id).value,
+      time:      document.getElementById("time-"       + id).value,
+      f1ab:      document.getElementById("f1ab-"       + id).value,
+      f1rate:    document.getElementById("f1rate-"     + id).value,
+      f1whole:   document.getElementById("f1whole-"    + id).value,
+      f2ab:      document.getElementById("f2ab-"       + id).value,
+      f2rate:    document.getElementById("f2rate-"     + id).value,
+      f2whole:   document.getElementById("f2whole-"    + id).value,
+      line:      document.getElementById("line-"       + id).value,
+      saltMeter: document.getElementById("saltmeter-"  + id).value,
+      saltPct:   document.getElementById("saltpct-"    + id).value,
+      pctBlank:  document.getElementById("pctblank-"   + id).value,
+      grade:     document.getElementById("grade-"      + id).value,
+      checkedBy: document.getElementById("checkedby-"  + id).value,
     });
   });
 
@@ -417,9 +429,18 @@ function submitAll() {
   }
 
   const payload = {
-    prodDate, grammage, productName, ssnCode, pctSeasoning,
-    ssnBatch, expDate, saltTarget,
-    hdrTime, hdrV1, hdrV2, hdrAvg,
+    prodDate,
+    grammage:     document.getElementById("grammage").value,
+    productName,
+    ssnCode:      document.getElementById("ssnCode").value,
+    pctSeasoning: document.getElementById("pctSeasoning").value,
+    ssnBatch:     document.getElementById("ssnBatch").value,
+    expDate:      document.getElementById("expDate").value,
+    saltTarget:   document.getElementById("saltTarget").value,
+    hdrTime:      document.getElementById("hdrTime").value,
+    hdrV1:        document.getElementById("hdrV1").value,
+    hdrV2:        document.getElementById("hdrV2").value,
+    hdrAvg:       document.getElementById("hdrAvg").value,
     rows
   };
 
@@ -451,7 +472,6 @@ function clearAll() {
   addRow();
 }
 
-// Start with one row
 addRow();
 </script>
 </body>

@@ -74,6 +74,16 @@
   td.grade-C input { color: var(--red); background: rgba(255,82,82,0.08); border-color: rgba(255,82,82,0.3); }
   td.grade-X input { color: var(--muted); }
 
+  /* Checked by checkboxes */
+  .cb-group { display: flex; flex-direction: column; gap: 6px; min-width: 90px; }
+  .cb-item { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .cb-item input[type="checkbox"] {
+    width: 20px; height: 20px; min-width: 20px; padding: 0;
+    accent-color: var(--accent); cursor: pointer; border-radius: 4px;
+    -webkit-appearance: auto;
+  }
+  .cb-item span { font-family: var(--mono); font-size: 13px; color: var(--text); }
+
   .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
   button { font-family: var(--mono); font-size: 12px; font-weight: 600; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; letter-spacing: 0.05em; transition: opacity 0.15s, transform 0.1s; }
   button:active { transform: scale(0.97); }
@@ -245,7 +255,7 @@ const PRODUCTS = {
   }
 };
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ4z8YdTkZ243dZw3Z26DPmAwkMnucYSALbts64TdkPeRuWJl1CyE1JDwWrfaD0VFM/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDG3oaXEy77e8ArzefnCeuh2UwYanwAI7UA0LHyJp816H9OJf3Y9sccTsxM5Jtpq4A/exec";
 
 function formatTimeInput(el) {
   let v = el.value.replace(/\D/g, '');
@@ -337,12 +347,21 @@ function addRow() {
     <td class="grade-cell" id="gradecell-${id}" style="min-width:70px">
       <input type="text" id="grade-${id}" readonly placeholder="—">
     </td>
-    <td style="min-width:100px">
-      <select id="checkedby-${id}">
-        <option value="">— Select —</option>
-        <option>Nisa</option>
-        <option>Danial</option>
-      </select>
+    <td style="min-width:90px">
+      <div class="cb-group">
+        <label class="cb-item">
+          <input type="checkbox" id="cb-nisa-${id}" value="Nisa">
+          <span>Nisa</span>
+        </label>
+        <label class="cb-item">
+          <input type="checkbox" id="cb-danial-${id}" value="Danial">
+          <span>Danial</span>
+        </label>
+        <label class="cb-item'>
+          <input type="checkbox" id="cb-asnira-${id}" value="Asnira">
+          <span>Asnira</span>
+        </label>
+      </div>
     </td>
     <td><button class="btn-del" onclick="delRow(${id})">✕</button></td>
   `;
@@ -418,7 +437,11 @@ function submitAll() {
       saltPct:   document.getElementById("saltpct-"    + id).value,
       pctBlank:  document.getElementById("pctblank-"   + id).value,
       grade:     document.getElementById("grade-"      + id).value,
-      checkedBy: document.getElementById("checkedby-"  + id).value,
+      checkedBy: [
+        document.getElementById("cb-nisa-"   + id).checked ? "Nisa"   : "",
+        document.getElementById("cb-danial-" + id).checked ? "Danial" : "",
+        document.getElementById("cb-asnira-" + id).checked ? "Asnira" : ""
+      ].filter(Boolean).join(", "),
     });
   });
 

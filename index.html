@@ -333,13 +333,13 @@ function addRow() {
       </div>
     </td>
     <td style="min-width:70px">
-      <input type="text" id="line-${id}" placeholder="1">
+      <input type="text" id="line-${id}" placeholder="e.g. 1, AV, BV" oninput="onLineChange(${id})">
     </td>
     <td style="min-width:90px">
       <input type="number" id="saltmeter-${id}" placeholder="1.50" step="0.01" oninput="recalcRow(${id})">
     </td>
     <td style="min-width:90px">
-      <input type="text" id="saltpct-${id}" readonly class="auto-calc" placeholder="—">
+      <input type="text" id="saltpct-${id}" readonly class="auto-calc" placeholder="—" oninput="onSaltPctManual(${id})">
     </td>
     <td style="min-width:100px">
       <input type="text" id="pctblank-${id}" readonly class="auto-calc" placeholder="—">
@@ -357,10 +357,6 @@ function addRow() {
           <input type="checkbox" id="cb-danial-${id}" value="Danial">
           <span>Danial</span>
         </label>
-        <label class="cb-item">
-          <input type="checkbox" id="cb-asnira-${id}" value="Asnira">
-          <span>Asnira</span>
-        </label>
       </div>
     </td>
     <td><button class="btn-del" onclick="delRow(${id})">✕</button></td>
@@ -373,7 +369,56 @@ function delRow(id) {
   if (row) row.remove();
 }
 
+function isManualLine(id) {
+  const line = document.getElementById("line-" + id).value.trim().toUpperCase();
+  return line === "AV" || line === "BV";
+}
+
+function onLineChange(id) {
+  const saltpctEl = document.getElementById("saltpct-" + id);
+  if (isManualLine(id)) {
+    // Switch to manual mode
+    saltpctEl.removeAttribute("readonly");
+    saltpctEl.classList.remove("auto-calc");
+    saltpctEl.classList.add("auto-filled");
+    saltpctEl.placeholder = "Enter manually";
+    saltpctEl.value = "";
+    document.getElementById("pctblank-" + id).value = "";
+    document.getElementById("grade-" + id).value = "—";
+    document.getElementById("gradecell-" + id).className = "grade-cell grade-X";
+  } else {
+    // Switch back to auto mode
+    saltpctEl.setAttribute("readonly", true);
+    saltpctEl.classList.add("auto-calc");
+    saltpctEl.classList.remove("auto-filled");
+    saltpctEl.placeholder = "—";
+    recalcRow(id);
+  }
+}
+
+function onSaltPctManual(id) {
+  // Only runs when in manual mode (AV/BV)
+  if (!isManualLine(id)) return;
+  const saltpct = parseFloat(document.getElementById("saltpct-" + id).value);
+  const p = getProduct();
+  let grade = "—", gradeClass = "grade-X";
+  if (p && !isNaN(saltpct)) {
+    const pctblank = parseFloat((p.coeffA * saltpct + p.coeffB).toFixed(2));
+    document.getElementById("pctblank-" + id).value = pctblank.toFixed(2);
+    const g = p.grades;
+    if      (pctblank >= g.A[0] && pctblank <= g.A[1]) { grade = "A"; gradeClass = "grade-A"; }
+    else if (pctblank >= g.B[0] && pctblank <= g.B[1]) { grade = "B"; gradeClass = "grade-B"; }
+    else if (pctblank >= g.C[0] && pctblank <= g.C[1]) { grade = "C"; gradeClass = "grade-C"; }
+    else                                                { grade = "OOC"; gradeClass = "grade-X"; }
+  } else {
+    document.getElementById("pctblank-" + id).value = "";
+  }
+  document.getElementById("grade-" + id).value = grade;
+  document.getElementById("gradecell-" + id).className = "grade-cell " + gradeClass;
+}
+
 function recalcRow(id) {
+  if (isManualLine(id)) return; // skip auto-calc if manual mode
   const sm  = parseFloat(document.getElementById("saltmeter-" + id).value);
   const avg = getHeaderAvg();
   const p   = getProduct();
@@ -439,8 +484,7 @@ function submitAll() {
       grade:     document.getElementById("grade-"      + id).value,
       checkedBy: [
         document.getElementById("cb-nisa-"   + id).checked ? "Nisa"   : "",
-        document.getElementById("cb-danial-" + id).checked ? "Danial" : "",
-        document.getElementById("cb-asnira-" + id).checked ? "Asnira" : ""
+        document.getElementById("cb-danial-" + id).checked ? "Danial" : ""
       ].filter(Boolean).join(", "),
     });
   });

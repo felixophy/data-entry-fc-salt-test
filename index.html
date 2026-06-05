@@ -441,7 +441,7 @@ function submitAll() {
         document.getElementById("cb-nisa-"   + id).checked ? "Nisa"   : "",
         document.getElementById("cb-danial-" + id).checked ? "Danial" : "",
         document.getElementById("cb-asnira-" + id).checked ? "Asnira" : ""
-      ].filter(Boolean).join(", "),
+      ].filter(Boolean).join(", ","),
     });
   });
 

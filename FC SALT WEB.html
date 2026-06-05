@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salt FC – Data Entry</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2333;
+    --border: #2a3050;
+    --accent: #4fc3f7;
+    --accent2: #f9a825;
+    --green: #69f0ae;
+    --red: #ff5252;
+    --text: #e8eaf6;
+    --muted: #7986cb;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; padding: 16px; }
+
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+  header .logo { width: 36px; height: 36px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 600; font-size: 13px; color: #000; flex-shrink: 0; }
+  header h1 { font-family: var(--mono); font-size: 15px; color: var(--accent); letter-spacing: 0.05em; }
+  header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .section-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .span2 { grid-column: span 2; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 10px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  input, select, textarea {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: var(--mono); font-size: 14px;
+    padding: 10px 12px; width: 100%; outline: none; transition: border-color 0.15s; -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input[readonly] { color: var(--muted); background: var(--bg); border-color: var(--border); cursor: not-allowed; }
+  input.auto-filled { color: var(--accent2); background: rgba(249,168,37,0.06); border-color: rgba(249,168,37,0.3); }
+  input.auto-calc { color: var(--green); background: rgba(105,240,174,0.06); border-color: rgba(105,240,174,0.3); }
+  textarea { resize: vertical; min-height: 64px; font-size: 13px; }
+  select option { background: var(--surface2); }
+
+  /* Unflavoured chips section */
+  .chips-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .chips-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* Rows table */
+  .rows-wrapper { overflow-x: auto; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; min-width: 820px; }
+  thead tr th { background: var(--bg); color: var(--muted); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 8px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: rgba(79,195,247,0.04); }
+  tbody td { padding: 5px 4px; }
+  tbody td input, tbody td select, tbody td textarea { padding: 7px 8px; font-size: 13px; min-width: 0; }
+
+  td.grade-cell input { font-weight: 600; text-align: center; }
+  td.grade-A input { color: var(--green); background: rgba(105,240,174,0.08); border-color: rgba(105,240,174,0.3); }
+  td.grade-B input { color: var(--accent2); background: rgba(249,168,37,0.08); border-color: rgba(249,168,37,0.3); }
+  td.grade-C input { color: var(--red); background: rgba(255,82,82,0.08); border-color: rgba(255,82,82,0.3); }
+  td.grade-X input { color: var(--muted); }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  button { font-family: var(--mono); font-size: 12px; font-weight: 600; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; letter-spacing: 0.05em; transition: opacity 0.15s, transform 0.1s; }
+  button:active { transform: scale(0.97); }
+  .btn-add { background: var(--surface2); color: var(--accent); border: 1px dashed var(--accent); }
+  .btn-del { background: transparent; color: var(--red); border: 1px solid rgba(255,82,82,0.3); padding: 7px 10px; font-size: 11px; }
+  .btn-submit { background: var(--accent); color: #000; flex: 1; padding: 14px; font-size: 14px; letter-spacing: 0.08em; }
+  .btn-clear { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 14px 18px; }
+
+  #status { margin-top: 12px; padding: 12px 16px; border-radius: 8px; font-family: var(--mono); font-size: 13px; display: none; }
+  #status.ok  { background: rgba(105,240,174,0.1); color: var(--green); border: 1px solid rgba(105,240,174,0.3); display:block; }
+  #status.err { background: rgba(255,82,82,0.1);   color: var(--red);   border: 1px solid rgba(255,82,82,0.3);   display:block; }
+  #status.loading { background: rgba(79,195,247,0.1); color: var(--accent); border: 1px solid rgba(79,195,247,0.3); display:block; }
+
+  .info-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .info-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .info-chip span { color: var(--accent2); }
+
+  @media (max-width: 500px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .grid3 { grid-template-columns: 1fr 1fr; }
+    .chips-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">FC</div>
+  <div>
+    <h1>SALT FC · DATA ENTRY</h1>
+    <p>Unflavoured Chips % Salt Monitor</p>
+  </div>
+</header>
+
+<!-- ── SECTION 1: Production Info ── -->
+<div class="section">
+  <div class="section-title">Production Info</div>
+  <div class="grid2">
+    <div class="field">
+      <label>Production Date</label>
+      <input type="date" id="prodDate">
+    </div>
+    <div class="field">
+      <label>Grammage (g)</label>
+      <input type="number" id="grammage" placeholder="e.g. 80">
+    </div>
+    <div class="field span2">
+      <label>Product Name</label>
+      <select id="productName" onchange="onProductChange()">
+        <option value="">— Select Product —</option>
+        <option>DELICIES ORIGINAL</option>
+        <option>DELICIES SOUR CREAM &amp; ONION</option>
+        <option>DELICIES BBQ</option>
+        <option>DELICIES HOT &amp; SPICY</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Seasoning Code &amp; Name (auto)</label>
+      <input type="text" id="ssnCode" readonly class="auto-filled" placeholder="Select product first">
+    </div>
+    <div class="field">
+      <label>% Seasoning in Product (auto)</label>
+      <input type="text" id="pctSeasoning" readonly class="auto-filled" placeholder="—">
+    </div>
+    <div class="field">
+      <label>Seasoning Batch No.</label>
+      <input type="text" id="ssnBatch" placeholder="e.g. BT-240601">
+    </div>
+    <div class="field">
+      <label>Expiry Date</label>
+      <input type="date" id="expDate">
+    </div>
+  </div>
+
+  <!-- Unflavoured Chips % Salt -->
+  <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+    <div class="section-title" style="margin-bottom:10px;">Unflavoured Chips % Salt</div>
+    <div class="chips-grid">
+      <div class="field">
+        <label>Time (HH:MM)</label>
+        <input type="text" id="hdrTime" placeholder="08:00" maxlength="5" oninput="formatTimeInput(this); recalcHeader()">
+      </div>
+      <div class="field">
+        <label>1.00</label>
+        <input type="number" id="hdrV1" placeholder="0.00" step="0.01" oninput="recalcHeader()">
+      </div>
+      <div class="field">
+        <label>2.00</label>
+        <input type="number" id="hdrV2" placeholder="0.00" step="0.01" oninput="recalcHeader()">
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:10px;">
+      <div class="field">
+        <label>AVG (auto)</label>
+        <input type="text" id="hdrAvg" readonly class="auto-calc" placeholder="—">
+      </div>
+      <div class="field">
+        <label>% Salt in Flavour Target (auto)</label>
+        <input type="text" id="saltTarget" readonly class="auto-filled" placeholder="—">
+      </div>
+    </div>
+    <!-- product info chips -->
+    <div class="info-row" id="productInfo" style="display:none; margin-top:10px;">
+      <div class="info-chip">Seasoning: <span id="chip-ssn">—</span></div>
+      <div class="info-chip">% Seasoning: <span id="chip-pct">—</span></div>
+      <div class="info-chip">Salt Target: <span id="chip-target">—</span></div>
+      <div class="info-chip">Grade: <span id="chip-grades">—</span></div>
+      <div class="info-chip">Coeff: <span id="chip-coeff">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 2: Measurement Rows ── -->
+<div class="section">
+  <div class="section-title">Measurement Rows</div>
+  <div class="rows-wrapper">
+    <table id="rowsTable">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Feeder Rate</th>
+          <th>Line</th>
+          <th>Salt Meter</th>
+          <th>Salt % (auto)</th>
+          <th>% Salt Blank (auto)</th>
+          <th>Grade (auto)</th>
+          <th>Checked By</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rowsBody"></tbody>
+    </table>
+  </div>
+  <div class="btn-row">
+    <button class="btn-add" onclick="addRow()">+ Add Row</button>
+  </div>
+</div>
+
+<!-- ── SECTION 3: Submit ── -->
+<div class="section">
+  <div class="section-title">Submit</div>
+  <div class="btn-row">
+    <button class="btn-clear" onclick="clearAll()">Clear All</button>
+    <button class="btn-submit" onclick="submitAll()">⬆ SUBMIT TO GOOGLE SHEETS</button>
+  </div>
+  <div id="status"></div>
+</div>
+
+<script>
+// ─── Product Reference Data ───────────────────────────────────────────────
+const PRODUCTS = {
+  "DELICIES ORIGINAL": {
+    ssnCode: "SALT", pctSeasoning: "1.00", saltTarget: "1.00",
+    grades: { A: [0.90, 1.10], B: [0.80, 1.20], C: [0.70, 1.30] },
+    coeffA: 0.6281, coeffB: 0.1438
+  },
+  "DELICIES SOUR CREAM & ONION": {
+    ssnCode: "SCO SSN FE-52306", pctSeasoning: "5.00", saltTarget: "0.93",
+    grades: { A: [0.84, 1.02], B: [0.74, 1.12], C: [0.65, 1.21] },
+    coeffA: 0.813, coeffB: 0.1525
+  },
+  "DELICIES BBQ": {
+    ssnCode: "BBQ SSN FE-52963", pctSeasoning: "5.00", saltTarget: "0.73",
+    grades: { A: [0.66, 0.80], B: [0.58, 0.88], C: [0.51, 0.95] },
+    coeffA: 0.4521, coeffB: 0.2353
+  },
+  "DELICIES HOT & SPICY": {
+    ssnCode: "HS SSN FE-53076", pctSeasoning: "5.00", saltTarget: "0.80",
+    grades: { A: [0.72, 0.88], B: [0.64, 0.96], C: [0.56, 1.04] },
+    coeffA: 0.7941, coeffB: 0.1922
+  }
+};
+
+// ── REPLACE WITH YOUR APPS SCRIPT URL ────────────────────────────────────
+const SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+
+// ─── Helpers ─────────────────────────────────────────────────────────────
+function formatTimeInput(el) {
+  let v = el.value.replace(/\D/g, '');
+  if (v.length > 2) v = v.slice(0,2) + ':' + v.slice(2,4);
+  el.value = v;
+}
+
+function getProduct() {
+  return PRODUCTS[document.getElementById("productName").value] || null;
+}
+
+// ─── Product Change ───────────────────────────────────────────────────────
+function onProductChange() {
+  const p = getProduct();
+  if (!p) {
+    ["ssnCode","pctSeasoning","saltTarget"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("productInfo").style.display = "none";
+    recalcAllRows();
+    return;
+  }
+  document.getElementById("ssnCode").value = p.ssnCode;
+  document.getElementById("pctSeasoning").value = p.pctSeasoning;
+  document.getElementById("saltTarget").value = p.saltTarget;
+  document.getElementById("chip-ssn").textContent = p.ssnCode;
+  document.getElementById("chip-pct").textContent = p.pctSeasoning + "%";
+  document.getElementById("chip-target").textContent = p.saltTarget;
+  document.getElementById("chip-grades").textContent =
+    `A:${p.grades.A[0]}–${p.grades.A[1]} B:${p.grades.B[0]}–${p.grades.B[1]} C:${p.grades.C[0]}–${p.grades.C[1]}`;
+  document.getElementById("chip-coeff").textContent = `${p.coeffA}x + ${p.coeffB}`;
+  document.getElementById("productInfo").style.display = "flex";
+  recalcAllRows();
+}
+
+// ─── Header AVG ──────────────────────────────────────────────────────────
+function recalcHeader() {
+  const v1 = parseFloat(document.getElementById("hdrV1").value);
+  const v2 = parseFloat(document.getElementById("hdrV2").value);
+  if (!isNaN(v1) && !isNaN(v2)) {
+    document.getElementById("hdrAvg").value = ((v1 + v2) / 2).toFixed(2);
+  } else {
+    document.getElementById("hdrAvg").value = "";
+  }
+  recalcAllRows();
+}
+
+function getHeaderAvg() {
+  const val = document.getElementById("hdrAvg").value;
+  return val !== "" ? parseFloat(val) : null;
+}
+
+// ─── Row Management ───────────────────────────────────────────────────────
+let rowCount = 0;
+
+function addRow() {
+  rowCount++;
+  const id = rowCount;
+  const tr = document.createElement("tr");
+  tr.id = "row-" + id;
+  tr.innerHTML = `
+    <td style="min-width:80px"><input type="text" id="time-${id}" placeholder="08:00" maxlength="5" oninput="formatTimeInput(this)"></td>
+    <td style="min-width:160px"><textarea id="feeder-${id}" placeholder="e.g. A 22.00" rows="2"></textarea></td>
+    <td style="min-width:70px"><input type="text" id="line-${id}" placeholder="1"></td>
+    <td style="min-width:90px"><input type="number" id="saltmeter-${id}" placeholder="1.50" step="0.01" oninput="recalcRow(${id})"></td>
+    <td style="min-width:90px"><input type="text" id="saltpct-${id}" readonly class="auto-calc" placeholder="—"></td>
+    <td style="min-width:100px"><input type="text" id="pctblank-${id}" readonly class="auto-calc" placeholder="—"></td>
+    <td class="grade-cell" id="gradecell-${id}" style="min-width:70px"><input type="text" id="grade-${id}" readonly placeholder="—"></td>
+    <td style="min-width:100px">
+      <select id="checkedby-${id}">
+        <option value="">— Select —</option>
+        <option>Nisa</option>
+        <option>Danial</option>
+      </select>
+    </td>
+    <td><button class="btn-del" onclick="delRow(${id})">✕</button></td>
+  `;
+  document.getElementById("rowsBody").appendChild(tr);
+}
+
+function delRow(id) {
+  const row = document.getElementById("row-" + id);
+  if (row) row.remove();
+}
+
+function recalcRow(id) {
+  const sm = parseFloat(document.getElementById("saltmeter-" + id).value);
+  const avg = getHeaderAvg();
+  const p = getProduct();
+
+  // Salt % = salt meter - avg, 2dp
+  let saltpct = null;
+  if (!isNaN(sm) && avg !== null) {
+    saltpct = parseFloat((sm - avg).toFixed(2));
+    document.getElementById("saltpct-" + id).value = saltpct.toFixed(2);
+  } else {
+    document.getElementById("saltpct-" + id).value = "";
+  }
+
+  // % Salt Blank = coeffA * saltpct + coeffB, 2dp
+  let pctblank = null;
+  let grade = "—";
+  let gradeClass = "grade-X";
+
+  if (p && saltpct !== null) {
+    pctblank = parseFloat((p.coeffA * saltpct + p.coeffB).toFixed(2));
+    document.getElementById("pctblank-" + id).value = pctblank.toFixed(2);
+
+    const g = p.grades;
+    if (pctblank >= g.A[0] && pctblank <= g.A[1])      { grade = "A"; gradeClass = "grade-A"; }
+    else if (pctblank >= g.B[0] && pctblank <= g.B[1]) { grade = "B"; gradeClass = "grade-B"; }
+    else if (pctblank >= g.C[0] && pctblank <= g.C[1]) { grade = "C"; gradeClass = "grade-C"; }
+    else                                                 { grade = "OOC"; gradeClass = "grade-X"; }
+  } else {
+    document.getElementById("pctblank-" + id).value = "";
+  }
+
+  document.getElementById("grade-" + id).value = grade;
+  const cell = document.getElementById("gradecell-" + id);
+  cell.className = "grade-cell " + gradeClass;
+}
+
+function recalcAllRows() {
+  document.querySelectorAll("[id^='saltmeter-']").forEach(el => {
+    recalcRow(parseInt(el.id.split("-")[1]));
+  });
+}
+
+// ─── Submit ───────────────────────────────────────────────────────────────
+function submitAll() {
+  const statusEl = document.getElementById("status");
+
+  const prodDate     = document.getElementById("prodDate").value;
+  const grammage     = document.getElementById("grammage").value;
+  const productName  = document.getElementById("productName").value;
+  const ssnCode      = document.getElementById("ssnCode").value;
+  const pctSeasoning = document.getElementById("pctSeasoning").value;
+  const ssnBatch     = document.getElementById("ssnBatch").value;
+  const expDate      = document.getElementById("expDate").value;
+  const saltTarget   = document.getElementById("saltTarget").value;
+  const hdrTime      = document.getElementById("hdrTime").value;
+  const hdrV1        = document.getElementById("hdrV1").value;
+  const hdrV2        = document.getElementById("hdrV2").value;
+  const hdrAvg       = document.getElementById("hdrAvg").value;
+
+  if (!prodDate || !productName) {
+    statusEl.className = "err";
+    statusEl.textContent = "❌ Please fill in Production Date and Product Name.";
+    return;
+  }
+
+  const rows = [];
+  document.querySelectorAll("[id^='time-']").forEach(el => {
+    const id = el.id.split("-")[1];
+    rows.push({
+      time:       document.getElementById("time-"      + id).value,
+      feeder:     document.getElementById("feeder-"    + id).value,
+      line:       document.getElementById("line-"      + id).value,
+      saltMeter:  document.getElementById("saltmeter-" + id).value,
+      saltPct:    document.getElementById("saltpct-"   + id).value,
+      pctBlank:   document.getElementById("pctblank-"  + id).value,
+      grade:      document.getElementById("grade-"     + id).value,
+      checkedBy:  document.getElementById("checkedby-" + id).value,
+    });
+  });
+
+  if (rows.length === 0) {
+    statusEl.className = "err";
+    statusEl.textContent = "❌ Please add at least one measurement row.";
+    return;
+  }
+
+  const payload = {
+    prodDate, grammage, productName, ssnCode, pctSeasoning,
+    ssnBatch, expDate, saltTarget,
+    hdrTime, hdrV1, hdrV2, hdrAvg,
+    rows
+  };
+
+  statusEl.className = "loading";
+  statusEl.textContent = "⏳ Submitting...";
+
+  fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(r => r.text())
+    .then(() => {
+      statusEl.className = "ok";
+      statusEl.textContent = "✅ Submitted! Data saved to Google Sheets.";
+    })
+    .catch(() => {
+      statusEl.className = "err";
+      statusEl.textContent = "❌ Failed. Check internet connection or Apps Script URL.";
+    });
+}
+
+function clearAll() {
+  if (!confirm("Clear all entered data?")) return;
+  ["prodDate","grammage","ssnBatch","expDate","hdrTime","hdrV1","hdrV2","hdrAvg","saltTarget","ssnCode","pctSeasoning"]
+    .forEach(id => document.getElementById(id).value = "");
+  document.getElementById("productName").value = "";
+  document.getElementById("productInfo").style.display = "none";
+  document.getElementById("rowsBody").innerHTML = "";
+  document.getElementById("status").className = "";
+  document.getElementById("status").textContent = "";
+  rowCount = 0;
+  addRow();
+}
+
+// Start with one row
+addRow();
+</script>
+</body>
+</html>

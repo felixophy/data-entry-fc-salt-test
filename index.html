@@ -357,7 +357,7 @@ function addRow() {
           <input type="checkbox" id="cb-danial-${id}" value="Danial">
           <span>Danial</span>
         </label>
-        <label class="cb-item'>
+        <label class="cb-item">
           <input type="checkbox" id="cb-asnira-${id}" value="Asnira">
           <span>Asnira</span>
         </label>
@@ -441,7 +441,7 @@ function submitAll() {
         document.getElementById("cb-nisa-"   + id).checked ? "Nisa"   : "",
         document.getElementById("cb-danial-" + id).checked ? "Danial" : "",
         document.getElementById("cb-asnira-" + id).checked ? "Asnira" : ""
-      ].filter(Boolean).join(", ","),
+      ].filter(Boolean).join(", "),
     });
   });
 

@@ -357,6 +357,34 @@ function addRow() {
           <input type="checkbox" id="cb-danial-${id}" value="Danial">
           <span>Danial</span>
         </label>
+        <label class="cb-item">
+         <input type="checkbox" id="cb-asnira-${id}" value="Asnira">
+         <span>Asnira</span>
+        </label>
+        <label class="cb-item">
+         <input type="checkbox" id="cb-gina-${id}" value="Gina">
+         <span>Gina</span>
+        </label>
+        <label class="cb-item">
+         <input type="checkbox" id="cb-hazirah-${id}" value="Hazirah">
+         <span>Hazirah</span>
+        </label>
+        <label class="cb-item">
+         <input type="checkbox" id="cb-fikri-${id}" value="Fikri">
+         <span>Fikri</span>
+        </label>
+        <label class="cb-item">
+         <input type="checkbox" id="cb-hanan-${id}" value="Hanan">
+         <span>Hanan</span>
+        </label>
+        <label class="cb-item">
+         <input type="checkbox" id="cb-solehah-${id}" value="Solehah">
+         <span>Solehah</span>
+        </label>
+        <label class="cb-item">
+         <input type="checkbox" id="cb-farah-${id}" value="Farah">
+         <span>Farah</span>
+        </label>
       </div>
     </td>
     <td><button class="btn-del" onclick="delRow(${id})">✕</button></td>
@@ -483,8 +511,15 @@ function submitAll() {
       pctBlank:  document.getElementById("pctblank-"   + id).value,
       grade:     document.getElementById("grade-"      + id).value,
       checkedBy: [
-        document.getElementById("cb-nisa-"   + id).checked ? "Nisa"   : "",
-        document.getElementById("cb-danial-" + id).checked ? "Danial" : ""
+        document.getElementById("cb-nisa-"    + id).checked ? "Nisa"    : "",
+        document.getElementById("cb-danial-"  + id).checked ? "Danial"  : "",
+        document.getElementById("cb-asnira-"  + id).checked ? "Asnira"  : "",
+        document.getElementById("cb-gina-"    + id).checked ? "Gina"    : "",
+        document.getElementById("cb-hazirah-" + id).checked ? "Hazirah" : "",
+        document.getElementById("cb-fikri-"   + id).checked ? "Fikri"   : "",
+        document.getElementById("cb-hanan-"   + id).checked ? "Hanan"   : "",
+        document.getElementById("cb-solehah-" + id).checked ? "Solehah" : "",
+        document.getElementById("cb-farah-"   + id).checked ? "Farah"   : ""
       ].filter(Boolean).join(", "),
     });
   });

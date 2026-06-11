@@ -549,7 +549,8 @@ function submitAll() {
   statusEl.className = "loading";
   statusEl.textContent = "⏳ Submitting...";
 
-  fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload), mode: "no-cors" })
+ const url = SCRIPT_URL + "?data=" + encodeURIComponent(JSON.stringify(payload));
+ fetch(url, { method: "GET", mode: "no-cors" })
     .then(r => r.text())
     .then(() => {
       statusEl.className = "ok";

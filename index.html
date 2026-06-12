@@ -512,13 +512,12 @@ function collectPayload(status) {
 
 // ─── Send to Sheets ───────────────────────────────────────────────────────
 function sendToSheets(payload) {
-  const formData = new FormData();
-  formData.append("data", JSON.stringify(payload));
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: formData,
-    mode: "no-cors"
-  });
+  try {
+    const url = SCRIPT_URL + "?data=" + encodeURIComponent(JSON.stringify(payload));
+    fetch(url, { method: "GET", mode: "no-cors" });
+  } catch(e) {
+    console.error("Send failed:", e);
+  }
 }
 
 // ─── Submit (FINAL) ───────────────────────────────────────────────────────

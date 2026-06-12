@@ -116,9 +116,7 @@
   .history-item .hi-detail { font-family: var(--mono); font-size: 11px; color: var(--muted); }
   .history-empty { font-family: var(--mono); font-size: 13px; color: var(--muted); text-align: center; padding: 30px 0; }
   .btn-del-history { background: transparent; color: var(--red); border: 1px solid rgba(255,82,82,0.3); padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; }
-  tr.row-submitted td input, tr.row-submitted td select, tr.row-submitted td textarea { opacity: 0.4; pointer-events: none; }
-  tr.row-submitted { background: rgba(105,240,174,0.04); }
-  .row-submitted-badge { font-family: var(--mono); font-size: 10px; color: var(--green); background: rgba(105,240,174,0.12); border: 1px solid rgba(105,240,174,0.3); border-radius: 10px; padding: 3px 8px; white-space: nowrap; }
+
 
   @media (max-width: 500px) {
     .grid2 { grid-template-columns: 1fr; }
@@ -555,15 +553,12 @@ function submitAll(status) {
 
   // Save to localStorage history
   if (status === "FINAL") {
-    // Mark submitted rows as locked
+    // Silently mark submitted rows (no visual lock)
     document.querySelectorAll("[id^='time-']").forEach(el => {
       const id = el.id.split("-")[1];
       const rowEl = document.getElementById("row-" + id);
       if (rowEl && !rowEl.classList.contains("row-submitted")) {
         rowEl.classList.add("row-submitted");
-        // Replace delete button with submitted badge
-        const lastTd = rowEl.querySelector("td:last-child");
-        if (lastTd) lastTd.innerHTML = '<span class="row-submitted-badge">✅ Sent</span>';
       }
     });
     saveToHistory(payload);

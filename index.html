@@ -516,14 +516,21 @@ function collectPayload(status) {
   };
 }
 
-// ─── Send to Sheets (one row at a time to avoid URL length limit) ────────
+// ─── Send to Sheets ──────────────────────────────────────────────────────
+// First call clears the sheet, then each row is sent one at a time
 function sendToSheets(payload) {
+  // Step 1: Send a clear command first
+  const clearPayload = { action: "clear" };
+  const clearUrl = SCRIPT_URL + "?data=" + encodeURIComponent(JSON.stringify(clearPayload));
+  fetch(clearUrl, { method: "GET", mode: "no-cors" });
+
+  // Step 2: Send each row with a delay to allow clear to complete first
   payload.rows.forEach((row, i) => {
-    const single = Object.assign({}, payload, { rows: [row] });
+    const single = Object.assign({}, payload, { rows: [row], action: "append" });
     setTimeout(() => {
       const url = SCRIPT_URL + "?data=" + encodeURIComponent(JSON.stringify(single));
       fetch(url, { method: "GET", mode: "no-cors" });
-    }, i * 300); // 300ms gap between each row to avoid overwhelming the script
+    }, 1000 + i * 300); // 1s delay for clear to finish, then 300ms per row
   });
 }
 

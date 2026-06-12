@@ -530,6 +530,7 @@ function submitAll() {
     return;
   }
 
+const p = getProduct();
   const payload = {
     prodDate,
     grammage:     document.getElementById("grammage").value,
@@ -539,6 +540,12 @@ function submitAll() {
     ssnBatch:     document.getElementById("ssnBatch").value,
     expDate:      document.getElementById("expDate").value,
     saltTarget:   document.getElementById("saltTarget").value,
+    gradeAMin:    p ? p.grades.A[0] : "",
+    gradeAMax:    p ? p.grades.A[1] : "",
+    gradeBMin:    p ? p.grades.B[0] : "",
+    gradeBMax:    p ? p.grades.B[1] : "",
+    gradeCMin:    p ? p.grades.C[0] : "",
+    gradeCMax:    p ? p.grades.C[1] : "",
     hdrTime:      document.getElementById("hdrTime").value,
     hdrV1:        document.getElementById("hdrV1").value,
     hdrV2:        document.getElementById("hdrV2").value,

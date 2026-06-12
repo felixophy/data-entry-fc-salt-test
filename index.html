@@ -465,11 +465,6 @@ function collectPayload(status) {
   const rows = [];
   document.querySelectorAll("[id^='time-']").forEach(el => {
     const id = el.id.split("-")[1];
-    // Skip already submitted rows when doing FINAL submit
-    if (status === "FINAL") {
-      const rowEl = document.getElementById("row-" + id);
-      if (rowEl && rowEl.classList.contains("row-submitted")) return;
-    }
     const names = ["nisa","danial","asnira","gina","hazirah","fikri","hanan","solehah","farah"];
     const checkedBy = names
       .filter(n => document.getElementById("cb-" + n + "-" + id).checked)
@@ -555,24 +550,9 @@ function submitAll(status) {
 
   const payload = collectPayload(status);
 
-  if (status === "FINAL" && payload.rows.length === 0) {
-    statusEl.className = "err";
-    statusEl.textContent = "⚠️ No new rows to submit — all rows already submitted.";
-    return;
-  }
-
   sendToSheets(payload);
 
-  // Save to localStorage history
   if (status === "FINAL") {
-    // Silently mark submitted rows (no visual lock)
-    document.querySelectorAll("[id^='time-']").forEach(el => {
-      const id = el.id.split("-")[1];
-      const rowEl = document.getElementById("row-" + id);
-      if (rowEl && !rowEl.classList.contains("row-submitted")) {
-        rowEl.classList.add("row-submitted");
-      }
-    });
     saveToHistory(payload);
     localStorage.removeItem(DRAFT_KEY);
     statusEl.className = "ok";

@@ -173,6 +173,10 @@
       <input type="text" id="ssnBatch" placeholder="e.g. BT-240601">
     </div>
     <div class="field">
+      <label>Date of Manufacturing</label>
+      <input type="date" id="dateOfManufacturing">
+    </div>
+    <div class="field">
       <label>Expiry Date</label>
       <input type="date" id="expDate">
     </div>
@@ -494,6 +498,7 @@ function collectPayload(status) {
     ssnCode:      document.getElementById("ssnCode").value,
     pctSeasoning: document.getElementById("pctSeasoning").value,
     ssnBatch:     document.getElementById("ssnBatch").value,
+    dateOfManufacturing: document.getElementByID("dateOfManufacturing").value,
     expDate:      document.getElementById("expDate").value,
     saltTarget:   document.getElementById("saltTarget").value,
     gradeAMin:    p ? p.grades.A[0] : "",

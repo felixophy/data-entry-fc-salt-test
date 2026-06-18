@@ -427,6 +427,7 @@ function addRow() {
         <label class="cb-item"><input type="checkbox" id="cb-hanan-${id}"><span>Hanan</span></label>
         <label class="cb-item"><input type="checkbox" id="cb-solehah-${id}"><span>Solehah</span></label>
         <label class="cb-item"><input type="checkbox" id="cb-farah-${id}"><span>Farah</span></label>
+        <label class="cb-item"><input type="checkbox" id="cb-ying-${id}"><span>Ying</span></label>
       </div>
     </td>
     <td><button class="btn-del" onclick="delRow(${id})">✕</button></td>
@@ -514,7 +515,7 @@ function collectPayload(status) {
   const rows = [];
   document.querySelectorAll("[id^='time-']").forEach(el => {
     const id = el.id.split("-")[1];
-    const names = ["nisa","danial","asnira","gina","hazirah","fikri","hanan","solehah","farah"];
+    const names = ["nisa","danial","asnira","gina","hazirah","fikri","hanan","solehah","farah","ying"];
     const checkedBy = names
       .filter(n => document.getElementById("cb-" + n + "-" + id).checked)
       .map(n => n.charAt(0).toUpperCase() + n.slice(1))
@@ -761,7 +762,7 @@ function loadPayloadIntoForm(d) {
     recalcRow(id);
 
     // Restore checkboxes
-    const names = ["nisa","danial","asnira","gina","hazirah","fikri","hanan","solehah","farah"];
+    const names = ["nisa","danial","asnira","gina","hazirah","fikri","hanan","solehah","farah","ying"];
     const checked = (row.checkedBy || "").split(", ").map(n => n.toLowerCase());
     names.forEach(n => {
       const el = document.getElementById("cb-" + n + "-" + id);

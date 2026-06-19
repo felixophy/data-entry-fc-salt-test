@@ -24,7 +24,7 @@
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; padding: 16px; }
 
   header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
-  header .logo { width: 36px; height: 48px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 600; font-size: 13px; color: #000; flex-shrink: 0; }
+  header .logo { width: 100px; height: 48px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 600; font-size: 13px; color: #000; flex-shrink: 0; }
   header h1 { font-family: var(--mono); font-size: 15px; color: var(--accent); letter-spacing: 0.05em; }
   header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
@@ -46,8 +46,8 @@
   }
   input:focus, select:focus { border-color: var(--accent); }
   input[readonly] { color: var(--muted); background: var(--bg); border-color: var(--border); cursor: not-allowed; }
-  input.auto-filled { color: var(--accent2); background: rgba(249,168,37,0.06); border-color: rgba(249,168,37,0.3); }
-  input.auto-calc { color: var(--green); background: rgba(105,240,174,0.06); border-color: rgba(105,240,174,0.3); }
+  input.auto-filled { color: #2a71bf; background: rgba(42, 113, 191, 0.06); border-color: rgba(42, 113, 191, 0.3); }
+  input.auto-calc   { color: #2a71bf; background: rgba(42, 113, 191, 0.06); border-color: rgba(42, 113, 191, 0.3); }
   select option { background: var(--surface2); }
 
   .chips-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
@@ -228,9 +228,9 @@
   </div>
 </div>
 
-<!-- ── SECTION 2: Measurement Rows ── -->
+<!-- ── SECTION 2: Salt Content Results ── -->
 <div class="section">
-  <div class="section-title">Measurement Rows</div>
+  <div class="section-title">Salt Content Results</div>
   <div class="rows-wrapper">
     <table id="rowsTable">
       <thead>
@@ -625,7 +625,7 @@ function submitAll(status) {
   const rows = document.querySelectorAll("[id^='time-']");
   if (rows.length === 0) {
     statusEl.className = "err";
-    statusEl.textContent = "❌ Please add at least one measurement row.";
+    statusEl.textContent = "❌ Please add at least one salt content results.";
     return;
   }
 

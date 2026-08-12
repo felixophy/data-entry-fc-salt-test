@@ -697,8 +697,13 @@ function sendToSheets(payload) {
     if (!sentFingerprints.has(fp)) newRows.push({ row, index, fp });
   });
   if (newRows.length === 0) return 0;
+
+  // Combine Expiry Date 1 & 2 into one value so they land in the same sheet column
+  const combinedExpDate = [payload.expDate, payload.expDate2].filter(Boolean).join(" / ");
+
   newRows.forEach(({ row, fp }, i) => {
-    const single = Object.assign({}, payload, { rows: [row], action: "append" });
+    const single = Object.assign({}, payload, { rows: [row], action: "append", expDate: combinedExpDate });
+    delete single.expDate2;
     setTimeout(() => {
       const url = SCRIPT_URL + "?data=" + encodeURIComponent(JSON.stringify(single));
       fetch(url, { method: "GET", mode: "no-cors" });

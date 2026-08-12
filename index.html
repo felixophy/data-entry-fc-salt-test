@@ -188,7 +188,7 @@
       </select>
     </div>
     <div class="field">
-      <label>Seasoning Code &amp; Name</label>
+      <label>Seasoning Code &amp; Name *</label>
       <input type="text" id="ssnCode">
     </div>
     <div class="field">
@@ -196,15 +196,15 @@
       <input type="text" id="pctSeasoning" readonly class="auto-filled" placeholder="—">
     </div>
     <div class="field">
-      <label>Seasoning Batch No.</label>
+      <label>Seasoning Batch No. *</label>
       <input type="text" id="ssnBatch" placeholder="e.g. BT-240601">
     </div>
     <div class="field">
-      <label>Date of Manufacturing</label>
+      <label>Date of Manufacturing *</label>
       <input type="date" id="dateOfManufacturing">
     </div>
     <div class="field">
-      <label>Expiry Date</label>
+      <label>Expiry Date *</label>
       <input type="date" id="expDate">
     </div>
   </div>
@@ -705,15 +705,48 @@ function sendToSheets(payload) {
   return newRows.length;
 }
 
+// ─── Field validation helpers ──────────────────────────────────────────────────
+const REQUIRED_FIELDS = [
+  { id: "ssnCode",             label: "Seasoning Code & Name" },
+  { id: "ssnBatch",            label: "Seasoning Batch No." },
+  { id: "dateOfManufacturing", label: "Date of Manufacturing" },
+  { id: "expDate",             label: "Expiry Date" }
+];
+
+function clearFieldErrors() {
+  REQUIRED_FIELDS.forEach(f => {
+    document.getElementById(f.id).style.borderColor = "";
+  });
+}
+
+function getMissingRequiredFields() {
+  const missing = [];
+  REQUIRED_FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (!el.value || !el.value.trim()) missing.push(f);
+  });
+  return missing;
+}
+
 // ─── Submit ───────────────────────────────────────────────────────────────────
 function submitAll(status) {
   const statusEl   = document.getElementById("status");
   const prodDate   = document.getElementById("prodDate").value;
   const productName = document.getElementById("productName").value;
+  clearFieldErrors();
   if (!prodDate || !productName) {
     statusEl.className = "err";
     statusEl.textContent = "❌ Please fill in Production Date and Product Name.";
     return;
+  }
+  if (status === "FINAL") {
+    const missing = getMissingRequiredFields();
+    if (missing.length > 0) {
+      missing.forEach(f => { document.getElementById(f.id).style.borderColor = "var(--red)"; });
+      statusEl.className = "err";
+      statusEl.textContent = "❌ Please fill in: " + missing.map(f => f.label).join(", ") + ".";
+      return;
+    }
   }
   const rows = document.querySelectorAll("[id^='time-']");
   if (rows.length === 0) {
@@ -852,6 +885,7 @@ function clearAll() {
   document.getElementById("rowsBody").innerHTML = "";
   document.getElementById("status").className = "";
   document.getElementById("status").textContent = "";
+  clearFieldErrors();
   rowCount = 0;
   addRow();
   localStorage.removeItem(DRAFT_KEY);

@@ -471,11 +471,10 @@ function getProduct() {
 function onProductChange() {
   const p = getProduct();
   if (!p) {
-    ["ssnCode","pctSeasoning","saltTarget"].forEach(id => document.getElementById(id).value = "");
+    ["pctSeasoning","saltTarget"].forEach(id => document.getElementById(id).value = "");
     document.getElementById("productInfo").style.display = "none";
     recalcAllRows(); return;
   }
-  document.getElementById("ssnCode").value      = p.ssnCode;
   document.getElementById("pctSeasoning").value = p.pctSeasoning;
   document.getElementById("saltTarget").value   = p.saltTarget;
   document.getElementById("chip-ssn").textContent    = p.ssnCode;

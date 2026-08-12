@@ -207,6 +207,10 @@
       <label>Expiry Date *</label>
       <input type="date" id="expDate">
     </div>
+    <div class="field">
+      <label>Expiry Date 2</label>
+      <input type="date" id="expDate2">
+    </div>
   </div>
 
   <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
@@ -658,6 +662,7 @@ function collectPayload(status) {
     ssnBatch:     document.getElementById("ssnBatch").value,
     dateOfManufacturing: document.getElementById("dateOfManufacturing").value,
     expDate:      document.getElementById("expDate").value,
+    expDate2:     document.getElementById("expDate2").value,
     saltTarget:   document.getElementById("saltTarget").value,
     gradeAMin:    p ? p.grades.A[0] : "",
     gradeAMax:    p ? p.grades.A[1] : "",
@@ -845,6 +850,7 @@ function loadPayloadIntoForm(d) {
   document.getElementById("ssnBatch").value = d.ssnBatch || "";
   document.getElementById("dateOfManufacturing").value = d.dateOfManufacturing || "";
   document.getElementById("expDate").value  = d.expDate || "";
+  document.getElementById("expDate2").value = d.expDate2 || "";
   document.getElementById("hdrTime").value  = d.hdrTime || "";
   document.getElementById("hdrV1").value    = d.hdrV1 || "";
   document.getElementById("hdrV2").value    = d.hdrV2 || "";
@@ -876,7 +882,7 @@ function loadPayloadIntoForm(d) {
 // ─── Clear All ────────────────────────────────────────────────────────────────
 function clearAll() {
   if (!confirm("Clear all entered data?")) return;
-  ["prodDate","grammage","ssnBatch","dateOfManufacturing","expDate",
+  ["prodDate","grammage","ssnBatch","dateOfManufacturing","expDate","expDate2",
    "hdrTime","hdrV1","hdrV2","hdrAvg","saltTarget","ssnCode","pctSeasoning"]
     .forEach(id => document.getElementById(id).value = "");
   document.getElementById("productName").value = "";
